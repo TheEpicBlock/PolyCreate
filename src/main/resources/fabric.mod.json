@@ -1,29 +1,29 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "polycreate",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "polycreate",
+  "description": "PolyMc compat for Create",
   "authors": [
-    "Me!"
+    "TheEpicBlock"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/TheEpicBlock/polycreate/blob/master/README.md",
+    "sources": "https://github.com/TheEpicBlock/polycreate"
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/polycreate/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "nl.theepicblock.polycreate.PolyCreate"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "polycreate.mixins.json"
   ],
 
   "depends": {
