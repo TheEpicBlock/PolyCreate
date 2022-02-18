@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "nl.theepicblock.polycreate.PolyCreate"
+    ],
+    "polymc": [
+      "nl.theepicblock.polycreate.PolyCreate"
     ]
   },
   "mixins": [
