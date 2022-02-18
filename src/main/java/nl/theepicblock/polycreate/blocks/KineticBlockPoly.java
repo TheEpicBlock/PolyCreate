@@ -6,15 +6,12 @@ import io.github.theepicblock.polymc.api.block.BlockPoly;
 import io.github.theepicblock.polymc.api.item.CustomModelDataManager;
 import io.github.theepicblock.polymc.api.resource.ModdedResources;
 import io.github.theepicblock.polymc.api.resource.PolyMcResourcePack;
-import io.github.theepicblock.polymc.api.resource.json.JModelDisplay;
-import io.github.theepicblock.polymc.api.resource.json.JModelDisplayType;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
 import io.github.theepicblock.polymc.impl.misc.logging.SimpleLogger;
 import io.github.theepicblock.polymc.impl.resource.json.JModelWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -23,13 +20,12 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import nl.theepicblock.polycreate.CMDHelper;
-import nl.theepicblock.polycreate.VArmorStand;
 import nl.theepicblock.polycreate.VSmallItemStand;
 
-public class ShaftPoly implements BlockPoly {
+public class KineticBlockPoly implements BlockPoly {
     public final static Item[] RESOURCE_GEN_ITEMS = {
             Items.WHITE_GLAZED_TERRACOTTA,
             Items.GRAY_GLAZED_TERRACOTTA,
@@ -37,7 +33,7 @@ public class ShaftPoly implements BlockPoly {
     };
     private final ItemStack stack;
 
-    public ShaftPoly(PolyRegistry registry) {
+    public KineticBlockPoly(PolyRegistry registry) {
         stack = CMDHelper.itemStackFromManager(registry.getSharedValues(CustomModelDataManager.KEY), RESOURCE_GEN_ITEMS);
     }
 
@@ -48,11 +44,12 @@ public class ShaftPoly implements BlockPoly {
 
     @Override
     public void addToResourcePack(Block block, ModdedResources moddedResources, PolyMcResourcePack pack, SimpleLogger logger) {
-        var generatedModelId = new Identifier("polycreate", "shaft");
+        var blockId = Registry.BLOCK.getId(block);
+        var generatedModelId = new Identifier("polycreate", blockId.getPath());
         CMDHelper.addToResourcePack(stack, pack, generatedModelId);
 
         var generatedModel = new JModelWrapper();
-        generatedModel.setParent("create:item/shaft");
+        generatedModel.setParent("create:item/"+blockId.getPath());
         VSmallItemStand.applyDisplay(generatedModel);
         pack.setItemModel(generatedModelId.getNamespace(), generatedModelId.getPath(), generatedModel);
     }
@@ -64,14 +61,14 @@ public class ShaftPoly implements BlockPoly {
 
     @Override
     public Wizard createWizard(ServerWorld world, Vec3d pos, Wizard.WizardState state) {
-        return new ShaftWizard(world, pos, state, stack);
+        return new KineticWizard(world, pos, state, stack);
     }
 
-    static class ShaftWizard extends Wizard {
+    static class KineticWizard extends Wizard {
         private final VSmallItemStand mainStand;
         private final Direction.Axis axis;
 
-        public ShaftWizard(ServerWorld world, Vec3d position, WizardState state, ItemStack displayStack) {
+        public KineticWizard(ServerWorld world, Vec3d position, WizardState state, ItemStack displayStack) {
             super(world, position, state);
             mainStand = new VSmallItemStand(displayStack);
             this.axis = this.getBlockState().get(Properties.AXIS);
@@ -80,6 +77,25 @@ public class ShaftPoly implements BlockPoly {
         @Override
         public void addPlayer(ServerPlayerEntity playerEntity) {
             mainStand.spawn(playerEntity, this.getPosition().add(0, 0.5, 0));
+            var be = (KineticTileEntity)this.getBlockEntity();
+            if (be == null) return;
+
+            var rotation = (this.getWorld().getServer().getTicks() * be.getSpeed() * 3f / 10) % 360;
+            float y,r,p;
+            if (axis == Direction.Axis.X) {
+                p = 0;
+                y = rotation;
+                r = 90;
+            } else if (axis == Direction.Axis.Y) {
+                p = 0;
+                y = rotation;
+                r = 0;
+            } else {
+                p = 90;
+                y = 0;
+                r = rotation;
+            }
+            mainStand.sendHeadRotation(playerEntity, p, y, r);
         }
 
         @Override
@@ -93,6 +109,8 @@ public class ShaftPoly implements BlockPoly {
         @Override
         public void onTick() {
             var be = (KineticTileEntity)this.getBlockEntity();
+            if (be == null) return;
+
             if (be.getSpeed() == 0) return;
             var rotation = (this.getWorld().getServer().getTicks() * be.getSpeed() * 3f / 10) % 360;
             float y,r,p;
