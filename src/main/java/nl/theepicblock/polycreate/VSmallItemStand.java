@@ -20,6 +20,7 @@ public class VSmallItemStand extends VArmorStand {
     public void spawn(ServerPlayerEntity playerEntity, Vec3d pos) {
         super.spawn(playerEntity, pos.add(0, -HEAD_Y_OFFSET, 0));
         this.sendArmorStandFlags(playerEntity, true, false, true, true);
+        this.sendFlags(playerEntity, false, false, false, false, true, false, false);
         this.sendSingleSlot(playerEntity, EquipmentSlot.HEAD, this.stack);
     }
 
