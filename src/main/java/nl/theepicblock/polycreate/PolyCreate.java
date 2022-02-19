@@ -18,4 +18,5 @@ public class PolyCreate implements ModInitializer, PolyMcEntrypoint {
 		registry.registerBlockPoly(AllBlocks.COGWHEEL.get(), new KineticBlockPoly(registry));
 		registry.registerBlockPoly(AllBlocks.LARGE_COGWHEEL.get(), new KineticBlockPoly(registry));
 	}
+
 }

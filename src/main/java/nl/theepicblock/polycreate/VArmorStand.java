@@ -40,14 +40,22 @@ public class VArmorStand extends AbstractVirtualEntity {
     }
 
     public void sendHeadRotation(ServerPlayerEntity playerEntity, EulerAngle angle) {
-        playerEntity.networkHandler.sendPacket(EntityUtil.createDataTrackerUpdate(
-                this.id,
-                ArmorStandEntity.TRACKER_HEAD_ROTATION,
-                angle
-        ));
+        playerEntity.networkHandler.sendPacket(headRotationPacket(angle));
     }
 
     public void sendHeadRotation(ServerPlayerEntity playerEntity, float pitch, float yaw, float roll) {
         sendHeadRotation(playerEntity, new EulerAngle(pitch, yaw, roll));
+    }
+
+    public EntityTrackerUpdateS2CPacket headRotationPacket(float pitch, float yaw, float roll) {
+        return headRotationPacket(new EulerAngle(pitch, yaw, roll));
+    }
+
+    public EntityTrackerUpdateS2CPacket headRotationPacket(EulerAngle angle) {
+        return EntityUtil.createDataTrackerUpdate(
+                this.id,
+                ArmorStandEntity.TRACKER_HEAD_ROTATION,
+                angle
+        );
     }
 }

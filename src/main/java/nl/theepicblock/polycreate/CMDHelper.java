@@ -6,7 +6,6 @@ import io.github.theepicblock.polymc.api.resource.json.JModelOverride;
 import io.github.theepicblock.polymc.impl.resource.ResourceConstants;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -21,7 +20,10 @@ public class CMDHelper {
         return stack;
     }
 
-    public static void addToResourcePack(ItemStack stack, PolyMcResourcePack pack, Identifier moddedModel) {
+    /**
+     * Adds an override for the appropriate client model to it's definition in the pack
+     */
+    public static void addOverrideToPack(ItemStack stack, PolyMcResourcePack pack, Identifier moddedModel) {
         var cmdValue = stack.getNbt().getInt("CustomModelData");
         var clientitemId = Registry.ITEM.getId(stack.getItem());
 
