@@ -1,7 +1,6 @@
 package nl.theepicblock.polycreate.blocks;
 
 import com.simibubi.create.content.contraptions.base.KineticTileEntity;
-import com.simibubi.create.content.contraptions.relays.elementary.ICogWheel;
 import io.github.theepicblock.polymc.api.PolyRegistry;
 import io.github.theepicblock.polymc.api.block.BlockPoly;
 import io.github.theepicblock.polymc.api.item.CustomModelDataManager;
@@ -114,7 +113,7 @@ public class KineticBlockPoly implements BlockPoly {
             if (d == 0)
                 offset = 22.5f;
 
-            var rotation = (this.getWorld().getServer().getTicks() * be.getSpeed() * 3f / 10 + offset) % 360;
+            var rotation = (this.getWorld().getServer().getTicks() * -be.getSpeed() * 3f / 10 + offset) % 360;
             float y,r,p;
             if (axis == Direction.Axis.X) {
                 p = 0;
