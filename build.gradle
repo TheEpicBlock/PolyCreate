@@ -41,6 +41,7 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	modRuntimeOnly "maven.modrinth:PolyPuck:1.2.0" // To help with testing
 	modImplementation "com.github.TheEpicBlock:PolyMc:${project.polymc_version}"
 	// Tested on commit a3c936f
 	modImplementation "com.simibubi:Create:mc1.18.1_v0.4c" // Have fun getting this into your local maven
