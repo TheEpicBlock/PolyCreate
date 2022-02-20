@@ -14,10 +14,14 @@ public class CMDHelper {
     public static ItemStack itemStackFromManager(CustomModelDataManager manager, Item[] profile) {
         var pair = manager.requestCMD(profile);
         var stack = new ItemStack(pair.getLeft());
-        var nbt = new NbtCompound();
-        nbt.putInt("CustomModelData", pair.getRight());
-        stack.setNbt(nbt);
+        addCmdToNbt(stack, pair.getRight());
         return stack;
+    }
+
+    public static void addCmdToNbt(ItemStack stack, int cmd) {
+        var nbt = new NbtCompound();
+        nbt.putInt("CustomModelData", cmd);
+        stack.setNbt(nbt);
     }
 
     /**
