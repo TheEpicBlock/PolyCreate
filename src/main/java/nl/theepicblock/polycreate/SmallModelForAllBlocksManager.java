@@ -55,22 +55,21 @@ public class SmallModelForAllBlocksManager implements SharedValuesKey.ResourceCo
                 }
                 var variant = variants[0]; // We won't support randomized models here
 
-                Identifier wrapperId = new Identifier("polycreate", "smallstand/" + variant.hashCode());
+                Identifier wrapperId = new Identifier("polycreate", "smallstand/" + Integer.toHexString(variant.hashCode()));
                 if (pack.getItemModel(wrapperId.getNamespace(), wrapperId.getPath()) == null) {
                     var wrapperModel = JModel.create();
                     wrapperModel.setParent(variant.model());
                     VSmallItemStand.applyDisplay(wrapperModel);
 
-                    if (variant.x() != 0 || variant.y() != 0) {
-                        var originalDisplay = wrapperModel.getDisplay(JModelDisplayType.HEAD);
-                        assert originalDisplay != null;
-                        // Fixme, these rotations are incorrect
-                        wrapperModel.setDisplay(JModelDisplayType.HEAD, new JModelDisplay(
-                                new double[]{originalDisplay.rotation()[0] - variant.x(), originalDisplay.rotation()[1] + variant.y(), originalDisplay.rotation()[2]},
-                                originalDisplay.translation(),
-                                originalDisplay.scale()
-                        ));
-                    }
+                    var originalDisplay = wrapperModel.getDisplay(JModelDisplayType.HEAD);
+                    assert originalDisplay != null;
+                    // Fixes rotations to match those specified
+                    wrapperModel.setDisplay(JModelDisplayType.HEAD, new JModelDisplay(
+                            new double[]{(originalDisplay.rotation()[0] + variant.x()) % 360, (originalDisplay.rotation()[1] + (variant.y() * (variant.x() == 180 ? 1 : -1)) + 180) % 360, originalDisplay.rotation()[2]},
+                            originalDisplay.translation(),
+                            originalDisplay.scale()
+                    ));
+
                     pack.setItemModel(wrapperId.getNamespace(), wrapperId.getPath(), wrapperModel);
                     pack.importRequirements(moddedResources, wrapperModel, logger);
                 }
