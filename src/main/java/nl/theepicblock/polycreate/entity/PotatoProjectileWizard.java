@@ -1,20 +1,17 @@
 package nl.theepicblock.polycreate.entity;
 
 import com.simibubi.create.content.curiosities.weapons.PotatoProjectileEntity;
-import io.github.theepicblock.polymc.api.entity.EntityPoly;
 import io.github.theepicblock.polymc.api.wizard.VSnowball;
-import io.github.theepicblock.polymc.api.wizard.Wizard;
+import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.poly.entity.EntityWizard;
-import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 
 public class PotatoProjectileWizard extends EntityWizard<PotatoProjectileEntity> {
     private final VSnowball snowball = new VSnowball();
 
-    public PotatoProjectileWizard(ServerWorld world, Vec3d position, PotatoProjectileEntity entity) {
-        super(world, position, entity);
+    public PotatoProjectileWizard(WizardInfo info, PotatoProjectileEntity entity) {
+        super(info, entity);
     }
 
     @Override

@@ -7,6 +7,7 @@ import io.github.theepicblock.polymc.api.item.CustomModelDataManager;
 import io.github.theepicblock.polymc.api.resource.ModdedResources;
 import io.github.theepicblock.polymc.api.resource.PolyMcResourcePack;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
+import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.misc.logging.SimpleLogger;
 import io.github.theepicblock.polymc.impl.resource.json.JModelWrapper;
 import net.minecraft.block.Block;
@@ -17,11 +18,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import nl.theepicblock.polycreate.CMDHelper;
 import nl.theepicblock.polycreate.VSmallItemStand;
@@ -62,16 +61,16 @@ public class KineticBlockPoly implements BlockPoly {
     }
 
     @Override
-    public Wizard createWizard(ServerWorld world, Vec3d pos, Wizard.WizardState state) {
-        return new KineticWizard(world, pos, state, stack);
+    public Wizard createWizard(WizardInfo info) {
+        return new KineticWizard(info, stack);
     }
 
     static class KineticWizard extends Wizard {
         private final VSmallItemStand mainStand;
         private final Direction.Axis axis;
 
-        public KineticWizard(ServerWorld world, Vec3d position, WizardState state, ItemStack displayStack) {
-            super(world, position, state);
+        public KineticWizard(WizardInfo info, ItemStack displayStack) {
+            super(info);
             mainStand = new VSmallItemStand(displayStack);
             this.axis = this.getBlockState().get(Properties.AXIS);
         }
@@ -113,7 +112,7 @@ public class KineticBlockPoly implements BlockPoly {
             if (d == 0)
                 offset = 22.5f;
 
-            var rotation = (this.getWorld().getServer().getTicks() * -be.getSpeed() * 3f / 10 + offset) % 360;
+            var rotation = this.getWorld() == null ? 0 : (this.getWorld().getServer().getTicks() * -be.getSpeed() * 3f / 10 + offset) % 360;
             float y,r,p;
             if (axis == Direction.Axis.X) {
                 p = 0;

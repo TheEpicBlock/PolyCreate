@@ -4,8 +4,7 @@ import com.simibubi.create.content.contraptions.components.structureMovement.Abs
 import io.github.theepicblock.polymc.api.PolyRegistry;
 import io.github.theepicblock.polymc.api.entity.EntityPoly;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
+import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import nl.theepicblock.polycreate.SmallModelForAllBlocksManager;
 
 public class ContraptionPoly implements EntityPoly<AbstractContraptionEntity> {
@@ -17,7 +16,7 @@ public class ContraptionPoly implements EntityPoly<AbstractContraptionEntity> {
 
 
     @Override
-    public Wizard createWizard(ServerWorld world, Vec3d pos, AbstractContraptionEntity entity) {
-        return new ContraptionWizard(world, pos, entity, this.blocksManager);
+    public Wizard createWizard(WizardInfo info, AbstractContraptionEntity entity) {
+        return new ContraptionWizard(info, entity, this.blocksManager);
     }
 }
