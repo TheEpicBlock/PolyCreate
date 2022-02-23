@@ -40,6 +40,9 @@ public class SmallModelForAllBlocksManager implements SharedValuesKey.ResourceCo
 
     @Override
     public void addToResourcePack(ModdedResources moddedResources, PolyMcResourcePack pack, SimpleLogger logger) {
+        // We need to access vanilla blockstate files
+        moddedResources = moddedResources.includeClientJar(logger);
+
         var clientItemId = Registry.ITEM.getId(this.item);
         for (var block : Registry.BLOCK) {
             var blockId = Registry.BLOCK.getId(block);
