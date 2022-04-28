@@ -4,6 +4,7 @@
   "package": "nl.theepicblock.polycreate.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ControlledContraptionEntityAccessor",
     "FixArmorMaterial"
   ],
   "injectors": {

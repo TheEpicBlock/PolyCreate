@@ -2,23 +2,26 @@ package nl.theepicblock.polycreate.entity;
 
 import com.simibubi.create.content.contraptions.components.structureMovement.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.components.structureMovement.Contraption;
+import com.simibubi.create.foundation.utility.VecHelper;
 import io.github.theepicblock.polymc.PolyMc;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.poly.entity.EntityWizard;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import nl.theepicblock.polycreate.SmallModelForAllBlocksManager;
 import nl.theepicblock.polycreate.VSmallItemStand;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContraptionWizard extends EntityWizard<AbstractContraptionEntity> {
-    private final Map<BlockPos,Wizard> wizardBlocks = new HashMap<>();
-    private final Map<BlockPos,VSmallItemStand> standBlocks = new HashMap<>();
+public class ContraptionWizard<T extends AbstractContraptionEntity> extends EntityWizard<T> {
+    protected final Map<BlockPos,Wizard> wizardBlocks = new HashMap<>();
+    protected final Map<BlockPos,VSmallItemStand> standBlocks = new HashMap<>();
 
-    public ContraptionWizard(WizardInfo info, AbstractContraptionEntity entity, SmallModelForAllBlocksManager blocksManager) {
+    public ContraptionWizard(WizardInfo info, T entity, SmallModelForAllBlocksManager blocksManager) {
         super(info, entity);
 
         var polyMap= PolyMc.getMainMap();
@@ -35,7 +38,7 @@ public class ContraptionWizard extends EntityWizard<AbstractContraptionEntity> {
     @Override
     public void addPlayer(ServerPlayerEntity playerEntity) {
         standBlocks.forEach((pos, stand) -> {
-            stand.spawn(playerEntity, this.getPosition().add(pos.getX(), pos.getY()+0.5, pos.getZ()));
+            stand.spawn(playerEntity, getStandPos(pos));
         });
         wizardBlocks.forEach((pos, wizard) -> {
             wizard.addPlayer(playerEntity);
@@ -46,13 +49,18 @@ public class ContraptionWizard extends EntityWizard<AbstractContraptionEntity> {
     public void onMove() {
         var players = this.getPlayersWatchingChunk();
         standBlocks.forEach((pos, stand) -> {
+            var standPos = getStandPos(pos);
             players.forEach(player -> {
-                stand.move(player, this.getPosition().add(pos.getX(), pos.getY()+0.5, pos.getZ()), (byte)0, (byte)0, false);
+                stand.move(player, standPos, (byte)0, (byte)0, false);
             });
         });
         wizardBlocks.forEach((pos, wizard) -> {
             wizard.onMove();
         });
+    }
+
+    protected Vec3d getStandPos(BlockPos pos) {
+        return this.getEntity().toGlobalVector(VecHelper.getCenterOf(pos), 0);
     }
 
     @Override
@@ -63,6 +71,11 @@ public class ContraptionWizard extends EntityWizard<AbstractContraptionEntity> {
         wizardBlocks.forEach((pos, wizard) -> {
             wizard.removePlayer(playerEntity);
         });
+    }
+
+    @Override
+    public @NotNull Vec3d getPosition() {
+        return getEntity().getAnchorVec();
     }
 
     private Contraption getContraption() {
