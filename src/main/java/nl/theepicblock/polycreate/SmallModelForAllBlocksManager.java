@@ -17,6 +17,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
 
 public class SmallModelForAllBlocksManager implements SharedValuesKey.ResourceContainer{
@@ -66,9 +68,15 @@ public class SmallModelForAllBlocksManager implements SharedValuesKey.ResourceCo
 
                     var originalDisplay = wrapperModel.getDisplay(JModelDisplayType.HEAD);
                     assert originalDisplay != null;
-                    // Fixes rotations to match those specified
+
+                    // Add the rotations of the block state variant to the model display
+                    var rotation = new Quaternion((float)originalDisplay.rotation()[0], (float)originalDisplay.rotation()[1], (float)originalDisplay.rotation()[2], true);
+                    rotation.hamiltonProduct(Vec3f.POSITIVE_Y.getDegreesQuaternion(180)); //Counteracts native stand rotation
+                    rotation.hamiltonProduct(Vec3f.POSITIVE_Y.getDegreesQuaternion(-variant.y()));
+                    rotation.hamiltonProduct(Vec3f.POSITIVE_X.getDegreesQuaternion(-variant.x()));
+                    var rotationEuler = quaterniun(rotation);
                     wrapperModel.setDisplay(JModelDisplayType.HEAD, new JModelDisplay(
-                            new double[]{(originalDisplay.rotation()[0] + variant.x()) % 360, (originalDisplay.rotation()[1] + (variant.y() * (variant.x() == 180 ? 1 : -1)) + 180) % 360, originalDisplay.rotation()[2]},
+                            new double[]{rotationEuler.getX(), rotationEuler.getY(), rotationEuler.getZ()},
                             originalDisplay.translation(),
                             originalDisplay.scale()
                     ));
@@ -83,5 +91,37 @@ public class SmallModelForAllBlocksManager implements SharedValuesKey.ResourceCo
                 clientItemModel.getOverrides().add(JModelOverride.ofCMD(cmd, ResourceConstants.itemLocation(wrapperId)));
             }
         }
+    }
+
+    public static Vec3f quaterniun(Quaternion q) {
+        var x = q.getX();
+        var y = q.getY();
+        var z = q.getZ();
+        var w = q.getW();
+        return new Vec3f(
+                round(radians2degrees((float)Math.atan2(-2.0*(y*z - w*x), w*w - y*y - x*x + z*z))),
+                round(radians2degrees((float)Math.asin(2.0*(x*z + w*y)))),
+                round(radians2degrees((float)Math.atan2(-2.0*(y*x - w*z), w*w - y*y + x*x - z*z)))
+        );
+    }
+
+    public static float radians2degrees(float in) {
+        return (float)(in/(2*Math.PI)*360);
+    }
+
+    public static float round(float in) {
+        if (89.5 < in && in < 90.5) {
+            return 90;
+        }
+        if (-90.5 < in && in < -89.5) {
+            return -90;
+        }
+        if (179.5 < in && in < 180.5) {
+            return 180;
+        }
+        if (-0.5 < in && in < 0.5 || 359.5 < in && in < 360.5) {
+            return 0;
+        }
+        return in;
     }
 }
