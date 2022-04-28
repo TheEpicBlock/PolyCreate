@@ -11,7 +11,7 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven { url 'https://jitpack.io' }
+	maven { url = "https://jitpack.io"}
 	maven { url = "https://api.modrinth.com/maven" }
 	maven { url = "https://cursemaven.com" }
 	maven { url = "https://maven.parchmentmc.org" }
@@ -32,7 +32,15 @@ repositories {
 			includeGroup("com.jamieswhiteshirt")
 		}
 	}
-	mavenLocal()
+	maven {
+		url "https://maven.theepicblock.nl"
+		content { includeGroup("nl.theepicblock") }
+	}
+	mavenLocal() {
+		content {
+			includeGroup("com.simibubi")
+		}
+	}
 }
 
 dependencies {
@@ -42,9 +50,9 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modRuntimeOnly "maven.modrinth:PolyPuck:1.2.0" // To help with testing
-	modImplementation "com.github.TheEpicBlock:PolyMc:${project.polymc_version}"
-	// Tested on commit a3c936f
-	modImplementation "com.simibubi:Create:mc1.18.1_v0.4c" // Have fun getting this into your local maven
+	modImplementation "nl.theepicblock:PolyMc:${project.polymc_version}"
+	// Tested on commit 263ba61
+	modImplementation "com.simibubi:Create:mc1.18.2_v0.4.1" // Have fun getting this into your local maven
 }
 
 processResources {
