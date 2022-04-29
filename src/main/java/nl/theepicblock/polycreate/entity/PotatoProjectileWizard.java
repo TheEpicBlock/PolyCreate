@@ -1,6 +1,7 @@
 package nl.theepicblock.polycreate.entity;
 
 import com.simibubi.create.content.curiosities.weapons.PotatoProjectileEntity;
+import io.github.theepicblock.polymc.api.wizard.PlayerView;
 import io.github.theepicblock.polymc.api.wizard.VSnowball;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.poly.entity.EntityWizard;
@@ -23,9 +24,9 @@ public class PotatoProjectileWizard extends EntityWizard<PotatoProjectileEntity>
     }
 
     @Override
-    public void onMove() {
+    public void onMove(PlayerView players) {
         var source = this.getEntity();
-        this.getPlayersWatchingChunk().forEach(player -> {
+        players.forEach(player -> {
             snowball.move(player, this.getPosition(), (byte)((int)(source.getYaw() * 256.0F / 360.0F)), (byte)((int)(source.getPitch() * 256.0F / 360.0F)), source.isOnGround());
             snowball.sendVelocity(player, source.getVelocity().add(source.powerX, source.powerY, source.powerZ));
         });

@@ -4,6 +4,7 @@ import com.simibubi.create.content.contraptions.components.structureMovement.Abs
 import com.simibubi.create.content.contraptions.components.structureMovement.Contraption;
 import com.simibubi.create.foundation.utility.VecHelper;
 import io.github.theepicblock.polymc.PolyMc;
+import io.github.theepicblock.polymc.api.wizard.PlayerView;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.poly.entity.EntityWizard;
@@ -46,8 +47,7 @@ public class ContraptionWizard<T extends AbstractContraptionEntity> extends Enti
     }
 
     @Override
-    public void onMove() {
-        var players = this.getPlayersWatchingChunk();
+    public void onMove(PlayerView players) {
         standBlocks.forEach((pos, stand) -> {
             var standPos = getStandPos(pos);
             players.forEach(player -> {

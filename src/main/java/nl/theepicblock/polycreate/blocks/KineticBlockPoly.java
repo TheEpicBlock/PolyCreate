@@ -6,6 +6,7 @@ import io.github.theepicblock.polymc.api.block.BlockPoly;
 import io.github.theepicblock.polymc.api.item.CustomModelDataManager;
 import io.github.theepicblock.polymc.api.resource.ModdedResources;
 import io.github.theepicblock.polymc.api.resource.PolyMcResourcePack;
+import io.github.theepicblock.polymc.api.wizard.PlayerView;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.misc.logging.SimpleLogger;
@@ -85,21 +86,20 @@ public class KineticBlockPoly implements BlockPoly {
         }
 
         @Override
-        public void onMove() {
-            this.getPlayersWatchingChunk().forEach(player -> {
+        public void onMove(PlayerView players) {
+            players.forEach(player -> {
                 mainStand.move(player, getPosition(), (byte)0, (byte)0, false);
             });
-            super.onMove();
         }
 
         @Override
-        public void onTick() {
+        public void onTick(PlayerView players) {
             var be = (KineticTileEntity)this.getBlockEntity();
             if (be == null) return;
             if (be.getSpeed() == 0) return;
             var packet = getHeadRotationPacket(be);
 
-            this.getPlayersWatchingChunk().forEach(player -> player.networkHandler.sendPacket(packet));
+            players.forEach(player -> player.networkHandler.sendPacket(packet));
         }
 
         public EntityTrackerUpdateS2CPacket getHeadRotationPacket(KineticTileEntity be) {

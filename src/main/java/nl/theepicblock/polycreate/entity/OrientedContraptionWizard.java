@@ -1,6 +1,7 @@
 package nl.theepicblock.polycreate.entity;
 
 import com.simibubi.create.content.contraptions.components.structureMovement.OrientedContraptionEntity;
+import io.github.theepicblock.polymc.api.wizard.PlayerView;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import nl.theepicblock.polycreate.SmallModelForAllBlocksManager;
 
@@ -10,8 +11,7 @@ public class OrientedContraptionWizard extends ContraptionWizard<OrientedContrap
     }
 
     @Override
-    public void onMove() {
-        var players = this.getPlayersWatchingChunk();
+    public void onMove(PlayerView players) {
         var entity = this.getEntity();
         var hasRotated = entity.prevYaw != entity.yaw || entity.prevPitch != entity.pitch;
         standBlocks.forEach((pos, stand) -> {
@@ -25,7 +25,7 @@ public class OrientedContraptionWizard extends ContraptionWizard<OrientedContrap
         });
         wizardBlocks.forEach((pos, wizard) -> {
             // TODO rotation
-            wizard.onMove();
+            wizard.onMove(players);
         });
     }
 }

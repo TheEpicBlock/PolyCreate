@@ -1,6 +1,7 @@
 package nl.theepicblock.polycreate.entity;
 
 import com.simibubi.create.content.contraptions.components.structureMovement.ControlledContraptionEntity;
+import io.github.theepicblock.polymc.api.wizard.PlayerView;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import net.minecraft.util.math.Direction;
 import nl.theepicblock.polycreate.SmallModelForAllBlocksManager;
@@ -12,8 +13,7 @@ public class ControlledContraptionWizard extends ContraptionWizard<ControlledCon
     }
 
     @Override
-    public void onMove() {
-        var players = this.getPlayersWatchingChunk();
+    public void onMove(PlayerView players) {
         var entity = (ControlledContraptionEntityAccessor)this.getEntity();
         var hasRotated = entity.getPrevAngle() != entity.getAngle();
         standBlocks.forEach((pos, stand) -> {
