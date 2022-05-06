@@ -1,6 +1,7 @@
 package nl.theepicblock.polycreate.entity;
 
 import com.simibubi.create.content.contraptions.components.structureMovement.ContraptionWorld;
+import io.github.theepicblock.polymc.api.wizard.UpdateInfo;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -24,6 +25,11 @@ public class ContraptionWizardInfo implements WizardInfo {
     @Override
     public @NotNull Vec3d getPosition() {
         return source.getPosition().add(pos.getX(), pos.getY()+0.5, pos.getZ());
+    }
+
+    @Override
+    public @NotNull Vec3d getPosition(UpdateInfo info) {
+        return source.getPosition(info).add(pos.getX(), pos.getY()+0.5, pos.getZ());
     }
 
     @Override

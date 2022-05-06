@@ -4,11 +4,11 @@ import com.simibubi.create.content.contraptions.components.structureMovement.Abs
 import com.simibubi.create.content.contraptions.components.structureMovement.Contraption;
 import com.simibubi.create.foundation.utility.VecHelper;
 import io.github.theepicblock.polymc.PolyMc;
-import io.github.theepicblock.polymc.api.wizard.PlayerView;
+import io.github.theepicblock.polymc.api.wizard.PacketConsumer;
+import io.github.theepicblock.polymc.api.wizard.UpdateInfo;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.poly.entity.EntityWizard;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import nl.theepicblock.polycreate.SmallModelForAllBlocksManager;
@@ -37,22 +37,20 @@ public class ContraptionWizard<T extends AbstractContraptionEntity> extends Enti
     }
 
     @Override
-    public void addPlayer(ServerPlayerEntity playerEntity) {
+    public void addPlayer(PacketConsumer players) {
         standBlocks.forEach((pos, stand) -> {
-            stand.spawn(playerEntity, getStandPos(pos));
+            stand.spawn(players, getStandPos(pos));
         });
         wizardBlocks.forEach((pos, wizard) -> {
-            wizard.addPlayer(playerEntity);
+            wizard.addPlayer(players);
         });
     }
 
     @Override
-    public void onMove(PlayerView players) {
+    public void update(PacketConsumer players, UpdateInfo info) {
         standBlocks.forEach((pos, stand) -> {
-            var standPos = getStandPos(pos);
-            players.forEach(player -> {
-                stand.move(player, standPos, (byte)0, (byte)0, false);
-            });
+            var standPos = getStandPos(pos, info);
+            stand.move(players, standPos, (byte)0, (byte)0, false);
         });
         wizardBlocks.forEach((pos, wizard) -> {
             wizard.onMove();
@@ -60,16 +58,25 @@ public class ContraptionWizard<T extends AbstractContraptionEntity> extends Enti
     }
 
     protected Vec3d getStandPos(BlockPos pos) {
-        return this.getEntity().toGlobalVector(VecHelper.getCenterOf(pos), 0);
+        return this.getEntity().toGlobalVector(VecHelper.getCenterOf(pos), 1);
+    }
+
+    protected Vec3d getStandPos(BlockPos pos, UpdateInfo info) {
+        var vec = Vec3d.of(pos);
+        vec = getEntity().applyRotation(vec, info.getTickDelta());
+        vec = vec.add(0.5, 0.5, 0.5);
+        vec = vec.add(this.getPosition(info));
+
+        return vec;
     }
 
     @Override
-    public void removePlayer(ServerPlayerEntity playerEntity) {
+    public void removePlayer(PacketConsumer players) {
         standBlocks.values().forEach(stand -> {
-            stand.remove(playerEntity);
+            stand.remove(players);
         });
         wizardBlocks.forEach((pos, wizard) -> {
-            wizard.removePlayer(playerEntity);
+            wizard.removePlayer(players);
         });
     }
 

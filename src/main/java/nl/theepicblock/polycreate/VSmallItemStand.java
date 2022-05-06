@@ -3,9 +3,9 @@ package nl.theepicblock.polycreate;
 import io.github.theepicblock.polymc.api.resource.json.JModel;
 import io.github.theepicblock.polymc.api.resource.json.JModelDisplay;
 import io.github.theepicblock.polymc.api.resource.json.JModelDisplayType;
+import io.github.theepicblock.polymc.api.wizard.PacketConsumer;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
 public class VSmallItemStand extends VArmorStand {
@@ -17,16 +17,16 @@ public class VSmallItemStand extends VArmorStand {
     }
 
     @Override
-    public void spawn(ServerPlayerEntity playerEntity, Vec3d pos) {
-        super.spawn(playerEntity, pos.add(0, -HEAD_Y_OFFSET, 0));
-        this.sendArmorStandFlags(playerEntity, true, false, true, true);
-        this.sendFlags(playerEntity, false, false, false, false, true, false, false);
-        this.sendSingleSlot(playerEntity, EquipmentSlot.HEAD, this.stack);
+    public void spawn(PacketConsumer players, Vec3d pos) {
+        super.spawn(players, pos.add(0, -HEAD_Y_OFFSET, 0));
+        this.sendArmorStandFlags(players, true, false, true, true);
+        this.sendFlags(players, false, false, false, false, true, false, false);
+        this.sendSingleSlot(players, EquipmentSlot.HEAD, this.stack);
     }
 
     @Override
-    public void move(ServerPlayerEntity playerEntity, double x, double y, double z, byte yaw, byte pitch, boolean onGround) {
-        super.move(playerEntity, x, y-HEAD_Y_OFFSET, z, yaw, pitch, onGround);
+    public void move(PacketConsumer players, double x, double y, double z, byte yaw, byte pitch, boolean onGround) {
+        super.move(players, x, y-HEAD_Y_OFFSET, z, yaw, pitch, onGround);
     }
 
     public static void applyDisplay(JModel model) {

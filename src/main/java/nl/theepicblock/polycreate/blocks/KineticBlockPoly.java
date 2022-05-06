@@ -6,7 +6,8 @@ import io.github.theepicblock.polymc.api.block.BlockPoly;
 import io.github.theepicblock.polymc.api.item.CustomModelDataManager;
 import io.github.theepicblock.polymc.api.resource.ModdedResources;
 import io.github.theepicblock.polymc.api.resource.PolyMcResourcePack;
-import io.github.theepicblock.polymc.api.wizard.PlayerView;
+import io.github.theepicblock.polymc.api.wizard.PacketConsumer;
+import io.github.theepicblock.polymc.api.wizard.UpdateInfo;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.misc.logging.SimpleLogger;
@@ -18,7 +19,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -69,6 +69,7 @@ public class KineticBlockPoly implements BlockPoly {
     static class KineticWizard extends Wizard {
         private final VSmallItemStand mainStand;
         private final Direction.Axis axis;
+        private volatile float speed = 0;
 
         public KineticWizard(WizardInfo info, ItemStack displayStack) {
             super(info);
@@ -77,32 +78,35 @@ public class KineticBlockPoly implements BlockPoly {
         }
 
         @Override
-        public void addPlayer(ServerPlayerEntity playerEntity) {
-            mainStand.spawn(playerEntity, this.getPosition().add(0, 0.5, 0));
+        public void addPlayer(PacketConsumer players) {
+            mainStand.spawn(players, this.getPosition().add(0, 0.5, 0));
             var be = (KineticTileEntity)this.getBlockEntity();
             if (be == null) return;
 
-            playerEntity.networkHandler.sendPacket(getHeadRotationPacket(be));
+            players.sendPacket(getHeadRotationPacket(be.getSpeed(), this.getWorld().getServer().getTicks(), 0));
         }
 
         @Override
-        public void onMove(PlayerView players) {
-            players.forEach(player -> {
-                mainStand.move(player, getPosition(), (byte)0, (byte)0, false);
-            });
+        public void onMove(PacketConsumer players) {
+            mainStand.move(players, getPosition(), (byte)0, (byte)0, false);
         }
 
         @Override
-        public void onTick(PlayerView players) {
+        public void onTick(PacketConsumer players) {
             var be = (KineticTileEntity)this.getBlockEntity();
             if (be == null) return;
-            if (be.getSpeed() == 0) return;
-            var packet = getHeadRotationPacket(be);
-
-            players.forEach(player -> player.networkHandler.sendPacket(packet));
+            this.speed = be.getSpeed();
         }
 
-        public EntityTrackerUpdateS2CPacket getHeadRotationPacket(KineticTileEntity be) {
+        @Override
+        public void update(PacketConsumer players, UpdateInfo info) {
+            if (speed == 0) return;
+            var packet = getHeadRotationPacket(this.speed, info.getTick(), info.getTickDelta());
+
+            players.sendPacket(packet);
+        }
+
+        public EntityTrackerUpdateS2CPacket getHeadRotationPacket(float speed, int tick, float tickDelta) {
             var pos = this.getBlockPos();
             // Usually this offset only applies to the cog itself. But we're rendering the cog together with the shaft,
             // this is why we can't offset only large cogs.
@@ -112,7 +116,7 @@ public class KineticBlockPoly implements BlockPoly {
             if (d == 0)
                 offset = 22.5f;
 
-            var rotation = this.getWorld() == null ? 0 : (this.getWorld().getServer().getTicks() * -be.getSpeed() * 3f / 10 + offset) % 360;
+            var rotation = this.getWorld() == null ? 0 : ((tick+tickDelta) * -speed * 3f / 10 + offset) % 360;
             float y,r,p;
             if (axis == Direction.Axis.X) {
                 p = 0;
@@ -136,8 +140,8 @@ public class KineticBlockPoly implements BlockPoly {
         }
 
         @Override
-        public void removePlayer(ServerPlayerEntity playerEntity) {
-            mainStand.remove(playerEntity);
+        public void removePlayer(PacketConsumer players) {
+            mainStand.remove(players);
         }
     }
 }
