@@ -1,13 +1,14 @@
 plugins {
 	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'maven-publish'
+	id 'org.ajoberstar.grgit' version '4.1.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
+version = "${project.mod_version}${getVersionMetadata()}+${project.minecraft_version}"
 group = project.maven_group
 
 repositories {
@@ -63,6 +64,28 @@ processResources {
 	}
 }
 
+def getVersionMetadata() {
+	if (grgit != null) {
+		def head = grgit.head()
+		def headTag = grgit.tag.list().find {
+			it.commit == head
+		}
+
+		if (headTag) {
+			return "" // This is a release
+		}
+
+		def id = head.abbreviatedId
+
+//		if (!grgit.status().clean) {
+//			id += "-dirty"
+//		}
+
+		return "-rev.${id}"
+	}
+	return "";
+}
+
 tasks.withType(JavaCompile).configureEach {
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
 	it.options.release = 17
@@ -91,9 +114,10 @@ publishing {
 
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+		maven {
+			name = "teb"
+			credentials(PasswordCredentials)
+			url = "https://maven.theepicblock.nl"
+		}
 	}
 }
