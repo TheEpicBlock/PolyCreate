@@ -4,7 +4,9 @@ import io.github.theepicblock.polymc.api.resource.json.JModel;
 import io.github.theepicblock.polymc.api.resource.json.JModelDisplay;
 import io.github.theepicblock.polymc.api.resource.json.JModelDisplayType;
 import io.github.theepicblock.polymc.api.wizard.PacketConsumer;
+import io.github.theepicblock.polymc.mixins.wizards.EntityAccessor;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 
@@ -19,8 +21,14 @@ public class VSmallItemStand extends VArmorStand {
     @Override
     public void spawn(PacketConsumer players, Vec3d pos) {
         super.spawn(players, pos.add(0, -HEAD_Y_OFFSET, 0));
-        this.sendArmorStandFlags(players, true, false, true, true);
-        this.sendFlags(players, false, false, false, false, true, false, false);
+//        this.sendArmorStandFlags(players, true, false, true, true);
+//        this.sendFlags(players, false, false, false, false, true, false, false);
+
+        // TODO need to make a better way to batch these
+        players.sendPacket(ExtendedEntityUtil.createDataTrackerUpdate(id,
+                ArmorStandEntity.ARMOR_STAND_FLAGS, (byte)(ArmorStandEntity.SMALL_FLAG + ArmorStandEntity.HIDE_BASE_PLATE_FLAG + ArmorStandEntity.MARKER_FLAG),
+                EntityAccessor.getFlagTracker(), (byte)(1 << 5)));
+
         this.sendSingleSlot(players, EquipmentSlot.HEAD, this.stack);
     }
 
