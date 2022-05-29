@@ -6,12 +6,12 @@ import io.github.theepicblock.polymc.api.block.BlockPoly;
 import io.github.theepicblock.polymc.api.item.CustomModelDataManager;
 import io.github.theepicblock.polymc.api.resource.ModdedResources;
 import io.github.theepicblock.polymc.api.resource.PolyMcResourcePack;
+import io.github.theepicblock.polymc.api.resource.json.JModel;
 import io.github.theepicblock.polymc.api.wizard.PacketConsumer;
 import io.github.theepicblock.polymc.api.wizard.UpdateInfo;
 import io.github.theepicblock.polymc.api.wizard.Wizard;
 import io.github.theepicblock.polymc.api.wizard.WizardInfo;
 import io.github.theepicblock.polymc.impl.misc.logging.SimpleLogger;
-import io.github.theepicblock.polymc.impl.resource.json.JModelWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -49,7 +49,7 @@ public class KineticBlockPoly implements BlockPoly {
         var generatedModelId = new Identifier("polycreate", blockId.getPath());
         CMDHelper.addOverrideToPack(stack, pack, generatedModelId);
 
-        var generatedModel = new JModelWrapper();
+        var generatedModel = JModel.create();
         generatedModel.setParent("create:item/"+blockId.getPath());
         VSmallItemStand.applyDisplay(generatedModel);
         pack.setItemModel(generatedModelId.getNamespace(), generatedModelId.getPath(), generatedModel);
