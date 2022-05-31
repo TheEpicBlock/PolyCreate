@@ -60,6 +60,9 @@ public class SmallModelForAllBlocksManager implements SharedValuesKey.ResourceCo
                 }
                 var variant = variants[0]; // We won't support randomized models here
 
+                if (isModelBanned(variant.model())) {
+                    continue;
+                }
                 Identifier wrapperId = new Identifier("polycreate", "smallstand/" + Integer.toHexString(variant.hashCode()));
                 if (pack.getItemModel(wrapperId.getNamespace(), wrapperId.getPath()) == null) {
                     var wrapperModel = JModel.create();
@@ -123,5 +126,9 @@ public class SmallModelForAllBlocksManager implements SharedValuesKey.ResourceCo
             return 0;
         }
         return in;
+    }
+
+    private static boolean isModelBanned(String id) {
+        return id.equals("packages:special/package") || id.equals("bitsandchisels:block/bits_block_model") || id.equals("packages:special/package_maker") || id.contains("consistency_plus"); // I'm blocking consistency plus just to keep the amount of models reasonable
     }
 }
