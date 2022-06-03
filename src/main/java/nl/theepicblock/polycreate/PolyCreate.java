@@ -14,6 +14,7 @@ import net.minecraft.block.Blocks;
 import nl.theepicblock.polycreate.blocks.KineticBlockPoly;
 import nl.theepicblock.polycreate.entity.ContraptionPoly;
 import nl.theepicblock.polycreate.entity.PotatoProjectileWizard;
+import nl.theepicblock.polycreate.entity.SuperGlueWizard;
 
 public class PolyCreate implements PolyMcEntrypoint {
 
@@ -34,5 +35,7 @@ public class PolyCreate implements PolyMcEntrypoint {
 		registry.registerEntityPoly(AllEntityTypes.GANTRY_CONTRAPTION.get(), (EntityPoly<GantryContraptionEntity>)(Object)new ContraptionPoly(registry));
 		registry.registerEntityPoly(AllEntityTypes.CONTROLLED_CONTRAPTION.get(), (EntityPoly<ControlledContraptionEntity>)(Object)new ContraptionPoly(registry));
 		registry.registerEntityPoly(AllEntityTypes.ORIENTED_CONTRAPTION.get(), (EntityPoly<OrientedContraptionEntity>)(Object)new ContraptionPoly(registry));
+
+		registry.registerEntityPoly(AllEntityTypes.SUPER_GLUE.get(), SuperGlueWizard::new);
 	}
 }
