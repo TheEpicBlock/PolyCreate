@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ContraptionWizard<T extends AbstractContraptionEntity> extends EntityWizard<T> {
+    private final static int MAX_BLOCKS = 50; // TODO un-hardcode
     protected final Map<BlockPos,Wizard> wizardBlocks = new HashMap<>();
     protected final Map<BlockPos,VSmallItemStand> standBlocks = new HashMap<>();
 
@@ -26,14 +27,16 @@ public class ContraptionWizard<T extends AbstractContraptionEntity> extends Enti
         super(info, entity);
 
         var polyMap= PolyMc.getMainMap();
-        getContraption().getBlocks().values().forEach(blockInfo -> {
-            var blockPoly = polyMap.getBlockPoly(blockInfo.state.getBlock());
-            if (blockPoly != null && blockPoly.hasWizard()) {
-                wizardBlocks.put(blockInfo.pos, blockPoly.createWizard(new ContraptionWizardInfo(blockInfo.pos, this, getContraption().getContraptionWorld())));
-            } else {
-                standBlocks.put(blockInfo.pos, new VSmallItemStand(blocksManager.getItemForState(blockInfo.state)));
-            }
-        });
+        if (getContraption().getBlocks().size() < MAX_BLOCKS) {
+            getContraption().getBlocks().values().forEach(blockInfo -> {
+                var blockPoly = polyMap.getBlockPoly(blockInfo.state.getBlock());
+                if (blockPoly != null && blockPoly.hasWizard()) {
+                    wizardBlocks.put(blockInfo.pos, blockPoly.createWizard(new ContraptionWizardInfo(blockInfo.pos, this, getContraption().getContraptionWorld())));
+                } else {
+                    standBlocks.put(blockInfo.pos, new VSmallItemStand(blocksManager.getItemForState(blockInfo.state)));
+                }
+            });
+        }
     }
 
     @Override
